@@ -104,12 +104,12 @@ section Units
 
 /-- A unit of length, described by its size in metres (a positive rational). -/
 class LengthUnit (U : Type) where
-  metres : ℚ
+  metres : ℚ≥0
   metres_pos : 0 < metres
 
 /-- A length measured in unit `U`. The unit is a phantom type, so mixing units is a type error. -/
 structure Length (U : Type) where
-  value : ℚ
+  value : ℚ≥0
 
 namespace Length
 variable {U V : Type}
@@ -170,13 +170,17 @@ section Examples
 
 /-! ### Example 1: the original fridge, with plain ℕ measurements. -/
 
-def fridge : Object3D ℕ :=
+def fridge : Object3D ℚ≥0 :=
   { size := ⟨30, 55, 30⟩, padding := ⟨2, 10, 2⟩ }
 
-def kitchenGap : Space ℕ :=
+def kitchenGap : Space ℚ≥0 :=
   { available := ⟨35, 75, 35⟩ }
 
-example : canFit fridge kitchenGap := by decide
+example
+: canFit fridge kitchenGap := by
+  decide_cbv
+
+
 
 /-! ### Example 2: any other object, e.g. a washing machine, in different units. -/
 
@@ -188,10 +192,7 @@ def gapInches : Space (Length Inch) :=
   { available := ⟨⟨14⟩, ⟨30⟩, ⟨14⟩⟩ }
 
 example : canFit fridgeCm (gapInches.convertUnits : Space (Length Centimetre)) := by
-  simp only [canFit_iff, Dims.map, Space.convertUnits, Space.map,
-    fridgeCm, gapInches, Length.le_def, Length.add_value, Length.convert_value,
-    Centimetre.metres, Inch.metres]
-  norm_num
+  decide_cbv
 
 end Examples
 
