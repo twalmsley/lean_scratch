@@ -1,29 +1,33 @@
 import Mathlib
 
-import Mathlib.Tactic
+---
+example : ∀ a b c : Nat, a = b → a = c → c = b := by
+  intro a b c h₁ h₂
+  rw [h₂] at h₁
+  exact h₁
 
--- (Assuming your structure looks something like this)
-structure Box where
-  width : ℕ
-  height : ℕ
-  depth : ℕ
+variable (x y z w : Nat)
 
--- Assuming a component-wise addition instance (or if it's already defined)
-instance : Add Box where
-  add a b := { width := a.width + b.width, height := a.height + b.height, depth := a.depth + b.depth }
+example (h₁ : x = y) (h₂ : y = z) (h₃ : z = w) : x = w := by
+  apply Eq.trans h₁
+  apply Eq.trans h₂
+  apply Eq.trans h₃
+  rfl
 
--- The Proof:
-def box1:Box := { width := 30, height := 55, depth := 30 }
-def box2:Box := { width := 2, height := 10, depth := 2 }
-example
-  : (box1 +
-        (box2 + box2)).width ≤
-    35 ∧
-  (box1 +
-          (box2 + box2)).height ≤
-      75 ∧
-    (box1 +
-          (box2 + box2)).depth ≤
-      35 := by
-  simp [box1, box1]
-  decide
+example (x y : Nat) (p : Nat → Prop) (q : Prop) (h : q → x = y)
+        (h' : p y) (hq : q) : p x := by
+  rw [h hq]
+  exact h'
+
+
+attribute [local simp] Nat.mul_comm Nat.mul_assoc Nat.mul_left_comm
+attribute [local simp] Nat.add_assoc Nat.add_comm Nat.add_left_comm
+
+example (w x y z : Nat) (p : Nat → Prop)
+        (h : p (x * y + z * w * x)) : p (x * w * z + y * x) := by
+  simp at *; assumption
+
+example (x y z : Nat) (p : Nat → Prop)
+        (h₁ : p (1 * x + y)) (h₂ : p (x * z * 1))
+        : p (y + 0 + x) ∧ p (z * x) := by
+  simp at * <;> constructor <;> assumption
