@@ -1,3 +1,4 @@
+import Mathlib
 
 namespace LRU
 
@@ -33,9 +34,47 @@ def removeKey (entries : List (K × V)) (key : K) :
 def removeFromOrder (order : List K) (key : K) : List K :=
   order.filter (fun k => decide (k ≠ key))
 
+/-- Removing a key removes every occurrence of that key from the access order. -/
+theorem removeFromOrder_none (order : List K) (key : K) :
+    key ∉ removeFromOrder order key := by
+  simp [removeFromOrder]
+
+/-- Membership in the filtered access order retains exactly entries for other keys. -/
+theorem removeFromOrder_mem_iff (order : List K) (key other : K) :
+    other ∈ removeFromOrder order key ↔ other ∈ order ∧ other ≠ key := by
+  simp [removeFromOrder]
+
+/-- Removing a key leaves every other key in the access order unchanged with respect to membership. -/
+theorem removeFromOrder_preserves_other
+    (order : List K) (removed other : K) (hne : other ≠ removed) :
+    other ∈ removeFromOrder order removed ↔ other ∈ order := by
+  rw [removeFromOrder_mem_iff]
+  simp [hne]
+
 /-- Mark a key as most recently used. -/
 def markUsed (order : List K) (key : K) : List K :=
   key :: removeFromOrder order key
+
+/-- Marking a key most recently used puts it at the front. -/
+theorem markUsed_head (order : List K) (key : K) :
+    (markUsed order key).head? = some key := by
+  simp [markUsed]
+
+/-- Marking a key removes earlier occurrences and retains membership of every other key. -/
+theorem markUsed_mem_iff (order : List K) (key other : K) :
+    other ∈ markUsed order key ↔ other = key ∨ other ∈ order := by
+  simp [markUsed, removeFromOrder_mem_iff]
+  constructor
+  · intro h
+    rcases h with hEq | hmem
+    · exact Or.inl hEq
+    · exact Or.inr hmem.1
+  · intro h
+    rcases h with hEq | hmem
+    · exact Or.inl hEq
+    · by_cases hne : other = key
+      · exact Or.inl hne
+      · exact Or.inr ⟨hmem, hne⟩
 
 /-- Check whether a key is present. -/
 def contains (cache : Cache K V) (key : K) : Bool :=
@@ -183,15 +222,35 @@ theorem lookup_removeKey (entries : List (K × V)) (removed : K) (key : K)
       · simp [hk, lookup]
         by_cases hkey : k = key
         · simp [hkey]
-        · split
-          · rfl
-          . sorry
+        · simp [hkey]
+          exact ih
       · simp [hk, lookup]
         by_cases hkey : k = key
-        · sorry
-        · sorry
+        · exact (hk (hkey ▸ hne)).elim
+        · simp [hkey]
+          exact ih
 
-open LRU
+
+-- Getting a missing key returns none.
+/-- A miss leaves the cache unchanged. -/
+theorem get_missing (cache : Cache K V) (key : K)
+    (h : lookup cache.entries key = none) :
+    get cache key = (none, cache) := by
+  simp [get, h]
+
+-- Getting an existing key returns its value.
+/-- A hit returns the stored value and marks the key as most recently used. -/
+theorem get_existing (cache : Cache K V) (key : K) (value : V)
+    (h : lookup cache.entries key = some value) :
+    get cache key =
+      (some value, { cache with accessOrder := markUsed cache.accessOrder key }) := by
+  simp [get, h]
+
+-- Removing a key makes it absent.
+/-- Removing a key deletes it from the resulting cache's entry list. -/
+theorem remove_lookup_none (cache : Cache K V) (key : K) :
+    lookup (remove cache key).2.entries key = none := by
+  simp [remove, removeKey_lookup_none]
 
 def cache0 : Cache Nat String :=
   empty 2
