@@ -3,8 +3,10 @@ import Mathlib
 inductive Expr  where
   | Const : ℝ → Expr
   | Plus : Expr → Expr → Expr
+  | Subt : Expr → Expr → Expr
   | Mult : Expr → Expr → Expr
   | Inc : Expr → Expr
+  | Dec : Expr → Expr
 
 open Expr
 
@@ -12,8 +14,10 @@ def evalExpr (e:Expr) : ℝ :=
   match e with
     | Const n => n
     | Plus e1 e2 => evalExpr e1 + evalExpr e2
+    | Subt e1 e2 => evalExpr e1 - evalExpr e2
     | Mult e1 e2 => evalExpr e1 * evalExpr e2
     | Inc e1 => 1 + evalExpr e1
+    | Dec e1 => evalExpr e1 - 1
 
 def e1 : Expr := Const 2
 def e2 : Expr := Const 3
@@ -25,16 +29,24 @@ theorem const_works :
   simp [evalExpr]
 
 theorem plus_works :
-  ∀ (x y : ℕ), evalExpr (Plus (Const x) (Const y)) = x + y := by
+  ∀ (x y : ℝ), evalExpr (Plus (Const x) (Const y)) = x + y := by
+  simp [evalExpr]
+
+theorem sub_works :
+  ∀ (x y : ℝ), evalExpr (Subt (Const x) (Const y)) = x - y := by
   simp [evalExpr]
 
 theorem mult_works :
-  ∀ (x y : ℕ), evalExpr (Mult (Const x) (Const y)) = x * y := by
+  ∀ (x y : ℝ), evalExpr (Mult (Const x) (Const y)) = x * y := by
   simp [evalExpr]
 
 theorem inc_works_all:
     ∀ e : Expr, evalExpr (Inc e) = evalExpr e + 1 := by
   simp [evalExpr, add_comm]
+
+theorem dec_works_all:
+    ∀ e : Expr, evalExpr (Dec e) = evalExpr e - 1 := by
+  simp [evalExpr]
 
 theorem plus_comm_all:
     ∀ (a b : Expr), evalExpr (Plus a b) = evalExpr (Plus b a) := by
