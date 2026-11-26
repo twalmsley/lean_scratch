@@ -8,6 +8,7 @@ import Scratch.Dependencies
 import Scratch.Expr
 import Scratch.FittingObjects
 import Scratch.JSON
+import Scratch.LED
 import Scratch.LRUCache
 import Scratch.RateLimiter
 import Scratch.ReserveStock
