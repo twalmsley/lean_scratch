@@ -7,7 +7,9 @@ import Scratch.Capital
 import Scratch.Dependencies
 import Scratch.Expr
 import Scratch.FittingObjects
+import Scratch.JSON
 import Scratch.LRUCache
 import Scratch.RateLimiter
 import Scratch.ReserveStock
+import Scratch.RingBuffer
 import Scratch.ShoppingBasket
