@@ -13,6 +13,8 @@ A collection of Lean 4 examples and exercises exploring type-safe domain modelli
 
 - **`Scratch/LRUCache.lean`** — Purely functional Least Recently Used cache (`LRU.Cache K V`) supporting `empty`, `lookup`, `contains`, `get`, `put`, and `remove`, with capacity-based eviction. Includes proofs for lookup membership/absence, key removal preservation, `markUsed` access-order invariants, and `get`/`remove` behaviour.
 - **`Scratch/RateLimiter.lean`** — Token bucket rate limiter (`TokenBucket` and `processRequest`) that refills tokens over elapsed time up to capacity and consumes a token when accepting a request. Includes proofs that token counts never exceed capacity, rejected requests leave zero tokens, accepted requests consume one token, and `lastRefill` never decreases.
+- **`Scratch/RingBuffer.lean`** — Bounded FIFO ring buffer (`Buffer α`) with `empty`, `push`, `pop`, `peek`, `back`, `clear`, `pushAll`, and `popN`. Includes proofs for size/capacity invariants, push/pop success and failure cases, list correspondence, zero-capacity behaviour, and that `pushAll`/`popN` never exceed capacity.
+- **`Scratch/JSON.lean`** — Inductive JSON AST (`JSONItem`) covering objects (`HashMap.Raw`), arrays, strings, real numbers, booleans, and null, with a small example value.
 
 ### Domain Modelling & Business Rules
 
@@ -27,4 +29,5 @@ A collection of Lean 4 examples and exercises exploring type-safe domain modelli
 - **`Scratch/FittingObjects.lean`** — Generic 3D spatial fitting (`Dims α`, `Object3D α` with per-side padding, `Space α`, and `canFit`) paired with phantom-typed length units (`Length U` and `LengthUnit` instances for `Metre`, `Centimetre`, `Inch`, and `Foot`). Proves monotonicity of `canFit`, unit self-conversion identity, and concrete fitting examples via `decide_cbv`.
 - **`Scratch/Expr.lean`** — Arithmetic expression AST (`Const`, `Plus`, `Mult`, `Inc`) evaluated over `ℝ` (`evalExpr`), with proofs of evaluation rules, increment behaviour, commutativity of `Plus` and `Mult`, and termination.
 - **`Scratch/Capital.lean`** — Computable `Float` model of capital growth with annual interest and withdrawals (`balanceF`, `trajectory`, `staysNonneg`, `firstNegativeYear`, `balanceClosed`, `exactTest`), accompanied by `#eval` experiments comparing recursive trajectories against closed-form expressions and depletion thresholds.
+- **`Scratch/LED.lean`** — Series LED circuit model (`LED`, `Resistor`, `Battery`, `Wire`, `Switch`, `Circuit`) with derived current, resistor power, and runtime, plus decidable operating constraints (`wellFormed`, `ledCurrentOk`, `satisfiesWhenOn`). Includes a concrete bill of materials and `decide_cbv` proofs for current limits, power rating, runtime, and open-switch behaviour.
 - **`Scratch/Dependencies.lean`** — Skeleton module (`aosd.dependencies`) with placeholder `Definitions` and `Proofs` sections.
